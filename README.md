@@ -1,13 +1,9 @@
 # toy-robot
 
-A Clojure library designed to ... well, that part is up to you.
-
-## Usage
-
-FIXME
+Toy Robot is a coding exercise which is popular in Melbourne
 
 ## License
 
-Copyright © 2014 FIXME
+Copyright © 2014 Scott Lowe
 
 Distributed under the Eclipse Public License, the same as Clojure.
