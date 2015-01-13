@@ -1,4 +1,4 @@
-(ns core
+(ns toy-robot.core
   (:require [clojure.string :as s]
             [clojure.java.io :as io])
   (:use clojure.pprint))
@@ -18,18 +18,16 @@
 
 (defn move [robot]
   (let [new-pos (condp = (:direction robot)
-                  :north (assoc robot :y (inc (:y robot)))
-                  :east  (assoc robot :x (inc (:x robot)))
-                  :south (assoc robot :y (dec (:y robot)))
-                  :west  (assoc robot :x (dec (:x robot))))]
+                  :north (update-in robot [:y] inc)
+                  :east  (update-in robot [:x] inc)
+                  :south (update-in robot [:y] dec)
+                  :west  (update-in robot [:x] dec))]
     (if (would-fall? robot)
       robot
       new-pos)))
 
 (defn report [{:keys [x y direction]}]
-  (apply str
-         (interpose ", "
-                    [x y (s/upper-case (name direction))])))
+  (s/join ", " [x y (s/upper-case (name direction))]))
 
 (defn rotate
   "Given an existing direction (:north, :south etc.), calculate the
@@ -83,21 +81,22 @@
 (defn parse-line [line]
   (let [place (place-match line)
         cmd (cmd-match line)]
+    (println place)
     (cond
       (some? place) {:cmd :place
-                         :x (nth place 1)
-                         :y (nth place 2)
-                         :direction (last place)}
-      (some? cmd) {:cmd (first cmd)})))
+                     :x (nth place 1)
+                     :y (nth place 2)
+                     :direction (last place)}
+      (some? cmd) {:cmd (first cmd)}
+      :else (throw (Exception. "Illegal line format")))))
 
 (def data-files
-  (->> (file-seq (io/file ".\\data"))
+  (->> (file-seq (io/file "./data"))
        (filter #(.isFile %))))
 
 (defn parse-file [file]
   (with-open [rdr (io/reader file)]
-    (doseq [line (line-seq rdr)]
-      (parse-line line))))
+    (let [lines (line-seq rdr)]
+      (doall
+        (map parse-line lines)))))
 
-(exec
-  (map parse-file data-files))
