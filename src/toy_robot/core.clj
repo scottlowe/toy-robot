@@ -84,14 +84,14 @@
   (let [place (place-match line)
         cmd (cmd-match line)]
     (cond
-      (not-empty place) {:cmd :place
+      (some? place) {:cmd :place
                          :x (nth place 1)
                          :y (nth place 2)
                          :direction (last place)}
-      (not-empty cmd) {:cmd (first cmd)})))
+      (some? cmd) {:cmd (first cmd)})))
 
 (def data-files
-  (->> (file-seq (io/file "../../data"))
+  (->> (file-seq (io/file ".\\data"))
        (filter #(.isFile %))))
 
 (defn parse-file [file]
