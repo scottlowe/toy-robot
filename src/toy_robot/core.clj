@@ -8,6 +8,7 @@
   [5 5])
 
 (defn would-fall? [{:keys [x y]}]
+  "Would the robot fall from the table, given proposed coordinates"
   (let [max-x (first table)
         max-y (second table)]
     (not
@@ -61,6 +62,9 @@
               (println (pos-summary robot))
               robot)))
 
+(defn keywordify [s]
+  (keyword (s/lower-case s)))
+
 (defn exec [inputs]
   "Takes an input of robot commands and executes them.
   All commands before a :place command will be ignored"
@@ -82,13 +86,12 @@
 (defn parse-line [line]
   (let [place (place-match line)
         cmd (cmd-match line)]
-    (println place)
     (cond
+      (some? cmd) {:cmd (keywordify cmd)}
       (some? place) {:cmd :place
-                     :x (nth place 1)
-                     :y (nth place 2)
-                     :direction (last place)}
-      (nil? cmd) {:cmd cmd}
+                     :x (Integer/parseInt (nth place 1))
+                     :y (Integer/parseInt (nth place 2))
+                     :direction (keywordify (last place))}
       :else (throw (Exception. "Illegal line format")))))
 
 (def data-files
@@ -101,3 +104,7 @@
       (doall
         (map parse-line lines)))))
 
+(defn -main []
+  (dorun
+    (map (comp exec parse-file)
+         data-files)))

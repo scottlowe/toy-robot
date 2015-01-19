@@ -69,3 +69,15 @@
   (is (= (cmd-match "aaaaaa bbbb") nil))
   (is (= (cmd-match "PLACE") nil))
   (is (= (cmd-match "MOVE") "MOVE")))
+
+(deftest parses-input-line-with-place
+  (let [expected {:cmd       :place
+                  :direction :north
+                  :x         0
+                  :y         0}]
+    (is (= (parse-line "PLACE 0,0,NORTH")
+           expected))))
+
+(deftest parses-input-line-with-cmd
+  (is (= (parse-line "MOVE")
+         {:cmd :move})))
