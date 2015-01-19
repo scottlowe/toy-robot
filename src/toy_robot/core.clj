@@ -22,11 +22,11 @@
                   :east  (update-in robot [:x] inc)
                   :south (update-in robot [:y] dec)
                   :west  (update-in robot [:x] dec))]
-    (if (would-fall? robot)
+    (if (would-fall? new-pos)
       robot
       new-pos)))
 
-(defn report [{:keys [x y direction]}]
+(defn pos-summary [{:keys [x y direction]}]
   (s/join ", " [x y (s/upper-case (name direction))]))
 
 (defn rotate
@@ -58,7 +58,7 @@
     :right  (turn-robot robot +)
     :move   (move robot)
     :report (do
-              (println (report robot))
+              (println (pos-summary robot))
               robot)))
 
 (defn exec [inputs]
@@ -76,7 +76,8 @@
 (defn cmd-match [line]
   (->> line
        (re-find #"^(MOVE|LEFT|RIGHT|REPORT)$")
-       (drop 1)))
+       (drop 1)
+       (first)))
 
 (defn parse-line [line]
   (let [place (place-match line)
@@ -87,7 +88,7 @@
                      :x (nth place 1)
                      :y (nth place 2)
                      :direction (last place)}
-      (some? cmd) {:cmd (first cmd)}
+      (nil? cmd) {:cmd cmd}
       :else (throw (Exception. "Illegal line format")))))
 
 (def data-files
